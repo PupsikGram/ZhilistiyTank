@@ -1,0 +1,456 @@
+<!DOCTYPE html>
+<html lang="ru" class="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CAIN OS v7.0 | ABSOLUTE EDITION</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Jura:wght@400;600;700&family=Russo+One&display=swap" rel="stylesheet">
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    fontFamily: {
+                        cyber: ['Jura', 'sans-serif'],
+                        header:['Russo One', 'sans-serif'],
+                    },
+                    colors: {
+                        dark: '#030303',
+                        card: '#0d1017',
+                        accent: '#00ffcc', // Neon Cyan
+                        alert: '#ff2a55',  // Neon Red
+                        warn: '#ffcc00',   // Neon Yellow
+                        textMain: '#e2e8f0',
+                        textMuted: '#94a3b8'
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        body { background-color: #030303; color: #e2e8f0; font-family: 'Jura', sans-serif; }
+        .glass-panel {
+            background: rgba(13, 16, 23, 0.85);
+            backdrop-filter: blur(12px);
+            border: 1px solid rgba(0, 255, 204, 0.15);
+            border-radius: 16px;
+            box-shadow: 0 8px 32px rgba(0,0,0,0.4);
+        }
+        .neon-border { border-left: 4px solid #00ffcc; }
+        .neon-border-alert { border-left: 4px solid #ff2a55; }
+        .neon-border-warn { border-left: 4px solid #ffcc00; }
+        
+        .tab-btn { transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1); }
+        .tab-btn.active { 
+            background: #00ffcc; 
+            color: #030303; 
+            font-weight: 800; 
+            box-shadow: 0 0 15px rgba(0,255,204,0.6); 
+            transform: translateY(-2px);
+        }
+        .hidden-tab { display: none; }
+        
+        /* Custom Scrollbar */
+        ::-webkit-scrollbar { width: 6px; }
+        ::-webkit-scrollbar-track { background: #030303; }
+        ::-webkit-scrollbar-thumb { background: #00ffcc; border-radius: 10px; }
+
+        .glitch { text-shadow: 2px 0 #00ffcc, -2px 0 #ff2a55; }
+        
+        table { width: 100%; border-collapse: collapse; }
+        th { background: rgba(0, 255, 204, 0.1); color: #00ffcc; padding: 10px; text-align: left; font-weight: bold; text-transform: uppercase; font-size: 0.75rem; border-bottom: 1px solid rgba(0, 255, 204, 0.3); }
+        td { padding: 10px; border-bottom: 1px solid rgba(255, 255, 255, 0.05); font-size: 0.85rem; }
+        tr:hover td { background: rgba(255, 255, 255, 0.02); }
+    </style>
+</head>
+<body class="p-2 md:p-4 pb-24">
+
+    <div class="max-w-6xl mx-auto space-y-6">
+        
+        <!-- HEADER & LIVE STATUS -->
+        <header class="glass-panel p-6 text-center relative overflow-hidden">
+            <div class="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-transparent via-accent to-transparent opacity-70"></div>
+            <h1 class="font-header text-4xl md:text-6xl text-accent mb-2 glitch uppercase tracking-widest">Project CAIN</h1>
+            <div class="flex flex-wrap justify-center gap-2 mb-4 text-xs font-bold">
+                <span class="bg-card border border-gray-700 px-3 py-1 rounded text-textMuted">SANYA | 32 ГОДА</span>
+                <span class="bg-card border border-gray-700 px-3 py-1 rounded text-textMuted">ЧЕРНИГОВ</span>
+                <span class="bg-accent/10 border border-accent/30 px-3 py-1 rounded text-accent">1.5 ГОДА ЧИСТОТЫ</span>
+                <span class="bg-alert/10 border border-alert/30 px-3 py-1 rounded text-alert">ГЭРБ + МЭЛЛОРИ-ВЕЙСС</span>
+            </div>
+            
+            <div class="bg-dark p-5 rounded-xl border border-gray-800 shadow-inner">
+                <p class="text-xs text-textMuted uppercase mb-1 tracking-widest">Локальное время (Чернигов)</p>
+                <div id="clock" class="text-5xl md:text-6xl font-bold text-white font-header tracking-wider mb-4 drop-shadow-[0_0_8px_rgba(255,255,255,0.3)]">00:00:00</div>
+                
+                <div class="bg-card border border-accent/40 p-4 rounded-lg text-left relative overflow-hidden">
+                    <div class="absolute left-0 top-0 w-1 h-full bg-accent animate-pulse"></div>
+                    <span class="text-accent font-bold text-xs uppercase block mb-1">⚡ Оперативная задача:</span>
+                    <span id="current-task" class="text-xl md:text-2xl font-bold text-white block leading-tight">Загрузка протокола...</span>
+                    <p id="current-details" class="text-sm text-textMuted mt-2 border-t border-gray-800 pt-2"></p>
+                </div>
+            </div>
+        </header>
+
+        <!-- NAVIGATION -->
+        <nav class="flex flex-wrap gap-2 justify-center sticky top-2 z-50 bg-dark/80 backdrop-blur p-2 rounded-xl border border-gray-800">
+            <button onclick="openTab('symbiosis')" id="btn-symbiosis" class="tab-btn active px-4 py-2 rounded-lg bg-card border border-gray-700 text-xs md:text-sm uppercase tracking-wider">Симбиоз (Режим)</button>
+            <button onclick="openTab('training')" id="btn-training" class="tab-btn px-4 py-2 rounded-lg bg-card border border-gray-700 text-xs md:text-sm uppercase tracking-wider">Тренировки (База)</button>
+            <button onclick="openTab('logistics')" id="btn-logistics" class="tab-btn px-4 py-2 rounded-lg bg-card border border-gray-700 text-xs md:text-sm uppercase tracking-wider">Бюджет & Еда</button>
+            <button onclick="openTab('redline')" id="btn-redline" class="tab-btn px-4 py-2 rounded-lg bg-card border border-alert/30 text-xs md:text-sm uppercase tracking-wider text-alert">Красная Линия</button>
+        </nav>
+
+        <!-- TAB 1: SYMBIOSIS (TIMELINE) -->
+        <section id="symbiosis" class="glass-panel p-4 md:p-8">
+            <h2 class="font-header text-2xl md:text-3xl text-accent mb-6 border-b border-gray-800 pb-3">СИМБИОЗ: ВРЕМЯ + ЕДА + ФАРМА</h2>
+            <p class="text-sm text-textMuted mb-8 italic">Каждая таблетка знает свою еду. Каждая еда знает своё упражнение. Каждое упражнение знает своё время.</p>
+            
+            <div class="space-y-6 relative before:absolute before:inset-0 before:ml-6 before:-translate-x-px md:before:mx-auto md:before:translate-x-0 before:h-full before:w-1 before:bg-gray-800">
+                
+                <!-- 07:00 -->
+                <div class="relative flex items-start justify-between md:justify-normal md:odd:flex-row-reverse group">
+                    <div class="flex items-center justify-center w-12 h-12 rounded-full border-4 border-dark bg-card text-accent font-bold z-10 shrink-0 shadow-[0_0_15px_rgba(0,255,204,0.4)] text-lg">07</div>
+                    <div class="w-[calc(100%-4rem)] md:w-[calc(50%-3rem)] p-5 rounded-2xl glass-panel neon-border">
+                        <h3 class="font-bold text-white text-lg mb-1">07:00 - 08:00 | Пробуждение & Детокс</h3>
+                        <p class="text-xs text-alert font-bold uppercase mb-3 bg-alert/10 inline-block px-2 py-1 rounded">Первый час БЕЗ ТЕЛЕФОНА!</p>
+                        <ul class="text-sm space-y-2 text-gray-300">
+                            <li><span class="text-accent font-bold">07:00:</span> Подъем. Стакан теплой воды (40°C) + Свет в глаза 5 мин.</li>
+                            <li><span class="text-accent font-bold">07:10:</span> <span class="text-white font-bold bg-gray-800 px-1 rounded">Золопент 40мг</span>. + "Широкий расфокусированный взгляд" (3 мин) для снятия тревоги.</li>
+                            <li><span class="text-accent font-bold">07:30:</span> Гимнастика Микулина (60 ударов пятками об пол) - разгон лимфы.</li>
+                            <li><span class="text-accent font-bold">07:35:</span> 1 ч.л. Хлорофилла + Диафрагмальное дыхание (Вдох 4с - Задержка 4с - Выдох 6с). <br><span class="text-alert text-xs font-bold">СТРОГО БЕЗ ВИМА ХОФА!</span></li>
+                        </ul>
+                    </div>
+                </div>
+
+                <!-- 08:25 -->
+                <div class="relative flex items-start justify-between md:justify-normal md:odd:flex-row-reverse group">
+                    <div class="flex items-center justify-center w-12 h-12 rounded-full border-4 border-dark bg-card text-accent font-bold z-10 shrink-0">08</div>
+                    <div class="w-[calc(100%-4rem)] md:w-[calc(50%-3rem)] p-5 rounded-2xl glass-panel neon-border">
+                        <h3 class="font-bold text-white text-lg mb-1">08:25 | Завтрак Чемпиона</h3>
+                        <div class="bg-card border border-gray-800 p-3 rounded-lg mb-3">
+                            <span class="text-warn font-bold text-xs uppercase block mb-1">🍽 Еда:</span>
+                            <span class="text-sm text-white">Овсянка (150г) + 3 вареных яйца + 1 банан + 1 ч.л. сливочного масла.</span>
+                        </div>
+                        <div class="bg-accent/5 border border-accent/20 p-3 rounded-lg">
+                            <span class="text-accent font-bold text-xs uppercase block mb-1">💊 Утренний Стек (08:50):</span>
+                            <ul class="text-xs space-y-1 text-gray-300">
+                                <li>• <strong class="text-white">В2 (Рибофлавин) 10мг</strong> + <strong class="text-white">Янтарка 0.05г</strong> (строго полтаблетки!).</li>
+                                <li>• <strong class="text-white">L-Теанин 200мг</strong> (Изолента для ЦНС, гасит искры).</li>
+                                <li>• <strong class="text-white">Родиола Розовая 50мг</strong> (Начинаем с минимума! Ремонт рецепторов).</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 10:00 -->
+                <div class="relative flex items-start justify-between md:justify-normal md:odd:flex-row-reverse group">
+                    <div class="flex items-center justify-center w-12 h-12 rounded-full border-4 border-dark bg-card text-warn font-bold z-10 shrink-0 shadow-[0_0_15px_rgba(255,204,0,0.3)]">10</div>
+                    <div class="w-[calc(100%-4rem)] md:w-[calc(50%-3rem)] p-5 rounded-2xl glass-panel neon-border-warn">
+                        <h3 class="font-bold text-white text-lg mb-1">10:00 - 10:35 | Минералы & Суставы</h3>
+                        <p class="text-xs text-warn font-bold uppercase mb-3 bg-warn/10 inline-block px-2 py-1 rounded">Фитиновый разрыв (1.5ч после каши) пройден!</p>
+                        <ul class="text-sm space-y-3 text-gray-300">
+                            <li class="bg-card p-2 rounded border border-gray-800"><span class="text-warn font-bold">10:00 Перекус:</span> 2 яйца ИЛИ 100г печени. <br>+ <span class="font-bold text-white text-accent">Wellness Men</span> (Минералы усвоятся на 100% без каши).</li>
+                            <li class="bg-card p-2 rounded border border-gray-800"><span class="text-warn font-bold">10:35 Коллаген-Хак:</span> 150мл бульона из лап + Аскорбат натрия (Вит. С) + 0.5 ч.л. желатина. <br><i class="text-xs text-textMuted">Пьем ровно за 55 мин до тренировки для смазки суставов.</i></li>
+                        </ul>
+                    </div>
+                </div>
+
+                <!-- 11:30 -->
+                <div class="relative flex items-start justify-between md:justify-normal md:odd:flex-row-reverse group">
+                    <div class="flex items-center justify-center w-12 h-12 rounded-full border-4 border-dark bg-card text-alert font-bold z-10 shrink-0 shadow-[0_0_15px_rgba(255,42,85,0.5)]">11</div>
+                    <div class="w-[calc(100%-4rem)] md:w-[calc(50%-3rem)] p-5 rounded-2xl glass-panel neon-border-alert">
+                        <h3 class="font-bold text-white text-lg mb-1">11:00 - 12:20 | БОЕВОЙ РЕЖИМ</h3>
+                        <p class="text-sm mb-3"><span class="text-accent font-bold">11:00:</span> 1 Банан (Гликоген для работы).</p>
+                        <div class="bg-alert/10 border border-alert/30 p-3 rounded-lg">
+                            <span class="text-alert font-bold text-sm uppercase block mb-1">🏋️ 11:30: ТРЕНИРОВКА (Макс 50 мин)</span>
+                            <p class="text-xs text-gray-300">Пульс строго до 100. Никакой задержки дыхания. Темп 6-3-1. Смотри вкладку "Тренировки".</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 13:00 -->
+                <div class="relative flex items-start justify-between md:justify-normal md:odd:flex-row-reverse group">
+                    <div class="flex items-center justify-center w-12 h-12 rounded-full border-4 border-dark bg-card text-accent font-bold z-10 shrink-0">13</div>
+                    <div class="w-[calc(100%-4rem)] md:w-[calc(50%-3rem)] p-5 rounded-2xl glass-panel neon-border">
+                        <h3 class="font-bold text-white text-lg mb-1">13:00 - 14:00 | Анаболизм & Обед</h3>
+                        <ul class="text-sm space-y-3 text-gray-300">
+                            <li class="bg-accent/5 p-2 rounded border border-accent/20"><span class="text-accent font-bold">13:00 (Окно):</span> 300мл молока + банан + сладость + <span class="text-white font-bold bg-accent/20 px-1 rounded">КРЕАТИН 3г</span>. <br><i class="text-xs text-textMuted">Инсулин от сладкого затащит креатин прямо в мышцы.</i></li>
+                            <li><span class="text-accent font-bold">13:50:</span> 1 ч.л. масла + кусочек сала (Запуск желчи перед едой).</li>
+                            <li class="bg-card p-2 rounded border border-gray-800"><span class="text-warn font-bold">14:00 ОБЕД:</span> Печень/Сердца 200г + гречка 80г + овощи. <br>
+                            <span class="text-accent font-bold text-xs mt-2 block">ЖИРОВОЙ СТЕК (в середине еды):</span>
+                            <span class="text-xs">CoQ10 (100мг) + PQQ (5мг) + Омега-3 + D3+K2. Жиры из еды растворят эти витамины на 100%.</span></li>
+                        </ul>
+                    </div>
+                </div>
+
+                <!-- 16:00 & 19:00 -->
+                <div class="relative flex items-start justify-between md:justify-normal md:odd:flex-row-reverse group">
+                    <div class="flex items-center justify-center w-12 h-12 rounded-full border-4 border-dark bg-card text-accent font-bold z-10 shrink-0">16</div>
+                    <div class="w-[calc(100%-4rem)] md:w-[calc(50%-3rem)] p-5 rounded-2xl glass-panel neon-border">
+                        <h3 class="font-bold text-white text-lg mb-1">16:00 - 19:00 | Вечерняя База</h3>
+                        <ul class="text-sm space-y-3 text-gray-300">
+                            <li><span class="text-accent font-bold">16:00 Полдник:</span> Творог 200г + яблоко + <span class="text-white font-bold bg-gray-800 px-1 rounded">БОР 3мг</span>.</li>
+                            <li class="bg-card p-2 rounded border border-gray-800"><span class="text-warn font-bold">19:00 УЖИН:</span> Желудки 200г + гречка 80г + овощи. <br><i class="text-xs text-alert font-bold">Последний плотный прием пищи! До сна 3.5 часа.</i></li>
+                            <li><span class="text-accent font-bold">После ужина:</span> Изометрия Засса (давление в дверных проемах, 50% усилия, дышать ровно).</li>
+                        </ul>
+                    </div>
+                </div>
+
+                <!-- 21:30 -->
+                <div class="relative flex items-start justify-between md:justify-normal md:odd:flex-row-reverse group">
+                    <div class="flex items-center justify-center w-12 h-12 rounded-full border-4 border-dark bg-card text-[#a855f7] font-bold z-10 shrink-0 shadow-[0_0_15px_rgba(168,85,247,0.5)]">21</div>
+                    <div class="w-[calc(100%-4rem)] md:w-[calc(50%-3rem)] p-5 rounded-2xl glass-panel border-l-4 border-[#a855f7]">
+                        <h3 class="font-bold text-white text-lg mb-1">21:00 - 22:30 | Регенерация & Сон</h3>
+                        <ul class="text-sm space-y-3 text-gray-300">
+                            <li><span class="text-[#a855f7] font-bold">21:00:</span> Ночной казеин (Молоко/Творог 100г + мед + 15г желатина).</li>
+                            <li class="bg-[#a855f7]/10 p-3 rounded-lg border border-[#a855f7]/30">
+                                <span class="text-white font-bold block mb-1">21:30 ГАШЕНИЕ ЦНС (Всё вместе):</span>
+                                <span class="text-xs">Аминалон + Магний Глицинат (400мг) + Таурин (500мг) + Глицин (3г под язык). <br><i class="text-textMuted">Магний + Таурин = идеальный тормоз мотора.</i></span>
+                            </li>
+                            <li><span class="text-[#a855f7] font-bold">21:40:</span> Релаксация Джекобсона (напряг/расслабил мышцы лежа).</li>
+                            <li><span class="text-[#a855f7] font-bold">22:00:</span> Физ. вздох (3 раза) -> Обливание ног ледяной водой.</li>
+                            <li><span class="text-[#a855f7] font-bold">22:30:</span> <span class="text-white font-bold bg-gray-800 px-1 rounded">Гавискон</span> -> Сон под наклоном (+16°C). Заклеить рот пластырем (носовое дыхание).</li>
+                        </ul>
+                    </div>
+                </div>
+
+            </div>
+        </section>
+
+        <!-- TAB 2: TRAINING -->
+        <section id="training" class="glass-panel p-4 md:p-8 hidden-tab">
+            <h2 class="font-header text-3xl text-accent mb-4 border-b border-gray-800 pb-2">ТЕРМИНАЛ: АРХИТЕКТУРА КЕЙНА</h2>
+            
+            <div class="bg-alert/10 border border-alert/50 p-5 rounded-xl mb-6">
+                <h3 class="font-bold text-alert text-lg uppercase mb-2">⚠ Внимание: Протокол Реактивации</h3>
+                <p class="text-sm text-gray-300 mb-3">Ты не тренировался 2 года. Плавный вход или смерть (травма). <br>Недели 1-2: ПРОБУЖДЕНИЕ (Легко). Недели 3-4: РАЗГОН. Недели 5-6: ГИПЕРТРОФИЯ.</p>
+                <div class="bg-dark p-3 rounded border border-gray-700">
+                    <span class="text-accent font-bold text-lg block mb-1">ЗАКОН ТЕМПА 6-3-1 (Для гантелей 4кг):</span>
+                    <ul class="text-sm text-gray-400 space-y-1">
+                        <li><strong class="text-white">ВНИЗ (Эксцентрика):</strong> 6 секунд. Медленно растягиваем.</li>
+                        <li><strong class="text-white">ВНИЗУ (Пауза):</strong> 3 секунды. НЕ РАССЛАБЛЯТЬ МЫШЦУ! (Virtual BFR).</li>
+                        <li><strong class="text-white">ВВЕРХ (Концентрика):</strong> 1 секунда. Взрыв и <strong class="text-alert">ВЫДОХ</strong>.</li>
+                    </ul>
+                </div>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
+                <!-- ПН -->
+                <div class="bg-card border border-gray-800 p-5 rounded-xl hover:border-accent/50 transition-colors">
+                    <h3 class="font-header text-xl text-accent mb-3">ПН: Спина + Бицепс + Хват</h3>
+                    <ul class="text-sm space-y-3 text-textMuted">
+                        <li><strong class="text-white">Супермен Статика:</strong> Лежа на животе, поднять грудь/ноги. 3х30-60 сек. Укрепляет сухожилия поясницы.</li>
+                        <li><strong class="text-white">Тяга гантели 4кг:</strong> Темп 6-3-1. Вверху сжать спину на 5 сек. 3х10-12.</li>
+                        <li><strong class="text-white">Стойка Мабу (Всадник):</strong> Бедра параллельно полу. 3х30-60 сек.</li>
+                        <li><strong class="text-white">21-ка Арнольда:</strong> 7 низ, 7 верх, 7 полных. Virtual BFR (не расслаблять внизу).</li>
+                        <li><strong class="text-white">Cornix (Хват):</strong> Рабочий вес 8-12 раз + <strong class="text-accent">Overcrush</strong> (давить 5 сек после закрытия).</li>
+                    </ul>
+                </div>
+                
+                <!-- СР -->
+                <div class="bg-card border border-gray-800 p-5 rounded-xl hover:border-accent/50 transition-colors">
+                    <h3 class="font-header text-xl text-accent mb-3">СР: Плечи + Трапеции</h3>
+                    <ul class="text-sm space-y-3 text-textMuted">
+                        <li><strong class="text-white">Жим сидя (Стато-динамика):</strong> Не доводить до конца вверху! (Не даем отдых). 3х15.</li>
+                        <li><strong class="text-white">Подъем Ларри Скотта:</strong> Наклон 15°, большой палец ВНИЗ. Пауза 3 сек вверху. 3х12. Качает ширину.</li>
+                        <li><strong class="text-white">W-подъем:</strong> В стороны + сгиб локтей. 3х15.</li>
+                        <li><strong class="text-white">Шраги:</strong> Пауза вверху 10 сек. 4х10. Строит "бычью шею".</li>
+                        <li><strong class="text-white">Стульчик у стены:</strong> 3х30-60 сек.</li>
+                    </ul>
+                </div>
+
+                <!-- ПТ -->
+                <div class="bg-card border border-gray-800 p-5 rounded-xl hover:border-accent/50 transition-colors">
+                    <h3 class="font-header text-xl text-accent mb-3">ПТ: Грудь + Трицепс</h3>
+                    <ul class="text-sm space-y-3 text-textMuted">
+                        <li><strong class="text-white">Пирамида Архитектора (Отжимания):</strong> Широкие (8) ➔ Алмаз (5) ➔ Асимметрия (6) ➔ Отказ. Без отдыха между видами! 2-3 круга.</li>
+                        <li><strong class="text-white">Разводка (Стрейч):</strong> Лежа, руки в стороны. Локти на полу = пауза 5 сек. 3х10-12.</li>
+                        <li><strong class="text-white">Трицепс из-за головы:</strong> Эксцентрика 6 сек. 3х10.</li>
+                        <li><strong class="text-white">Медвежья походка:</strong> На четвереньках, колени висят. 3х5-10 метров.</li>
+                    </ul>
+                </div>
+
+                <!-- ВТ/ЧТ/СБ -->
+                <div class="bg-card border border-gray-800 p-5 rounded-xl hover:border-accent/50 transition-colors">
+                    <h3 class="font-header text-xl text-accent mb-3">ВТ/ЧТ/СБ: База & Кардио</h3>
+                    <ul class="text-sm space-y-3 text-textMuted">
+                        <li><strong class="text-white">ВТ/ЧТ (Скакалка):</strong> 20 сек работа / 60 сек отдых. <strong class="text-alert">ПУЛЬС ДО 100!</strong></li>
+                        <li><strong class="text-white">Пресс (8 мин):</strong> Вакуум (пупок к хребту, 15с) ➔ Планка ➔ Мертвый жук ➔ Лодочка.</li>
+                        <li><strong class="text-white">СБ (Ноги):</strong> Присед с паузой 3-5 сек внизу (3х10). Болгарский сплит (3х8). Цапля (баланс 30с).</li>
+                        <li><strong class="text-white">Ежедневно (Засс):</strong> Изометрия в дверном проеме. Усилие 50% (не рвать!). <strong class="text-accent">ДЫШАТЬ НА УСИЛИИ!</strong></li>
+                    </ul>
+                </div>
+            </div>
+        </section>
+
+        <!-- TAB 3: LOGISTICS & FOOD -->
+        <section id="logistics" class="glass-panel p-4 md:p-8 hidden-tab">
+            <div class="flex flex-col md:flex-row justify-between items-start md:items-center mb-6 border-b border-gray-800 pb-4">
+                <div>
+                    <h2 class="font-header text-3xl text-accent mb-1">ЛОГИСТИКА & БЮДЖЕТ</h2>
+                    <p class="text-sm text-textMuted">АТБ (Доценко) / Союз (возле 12-й школы) / Рынок "Нива"</p>
+                </div>
+                <div class="mt-4 md:mt-0 text-right">
+                    <span class="block text-xs text-textMuted uppercase mb-1">Целевой Бюджет:</span>
+                    <span class="text-3xl font-bold text-white">~3 100 ₴</span>
+                </div>
+            </div>
+
+            <div class="space-y-8">
+                <!-- Food Table -->
+                <div>
+                    <h3 class="text-xl font-bold text-white mb-3 border-l-4 border-accent pl-3">🛒 Еда на месяц (Точный расчет)</h3>
+                    <p class="text-xs text-gray-400 mb-3">Забудь про 8 кг каши из первого аудита. Это пузо. Тут реальная база для массы.</p>
+                    <div class="overflow-x-auto rounded-xl border border-gray-800">
+                        <table class="w-full text-left text-sm whitespace-nowrap">
+                            <thead class="bg-dark text-accent uppercase">
+                                <tr><th>Продукт</th><th>Кол-во на месяц</th><th>Где брать</th><th>Бюджет (грн)</th></tr>
+                            </thead>
+                            <tbody class="divide-y divide-gray-800 bg-card text-gray-300">
+                                <tr><td class="font-bold text-white">Яйца (С1)</td><td>100 шт (3/день)</td><td>АТБ (Поштучно!)</td><td>~578 (по 5.78)</td></tr>
+                                <tr><td class="font-bold text-white">Гречка "Своя лінія"</td><td>3 уп. (0.9кг)</td><td>АТБ</td><td>~198 (по 66)</td></tr>
+                                <tr><td class="font-bold text-white">Овсянка</td><td>2 уп. (1кг)</td><td>АТБ / Союз</td><td>~60 (по 30)</td></tr>
+                                <tr><td class="font-bold text-white">Куриная Печень</td><td>4 кг</td><td>Союз / Рынок</td><td>~320 (по 80)</td></tr>
+                                <tr><td class="font-bold text-white">Куриные Сердца</td><td>5 кг</td><td>Рынок</td><td>~450 (по 90)</td></tr>
+                                <tr><td class="font-bold text-white">Куриные Желудки</td><td>3 кг</td><td>Рынок</td><td>~270 (по 90)</td></tr>
+                                <tr><td class="font-bold text-white">Творог 5%</td><td>10 уп. (200г)</td><td>АТБ (Ищи акции)</td><td>~400 (по 40)</td></tr>
+                                <tr><td class="font-bold text-white">Молоко 2.5%</td><td>8 пак. (0.9л)</td><td>АТБ</td><td>~320 (по 40)</td></tr>
+                                <tr><td class="font-bold text-white">Бананы</td><td>3 кг</td><td>АТБ / Союз</td><td>~180 (по 60)</td></tr>
+                                <tr><td class="font-bold text-white">Куриные Лапы</td><td>3 кг</td><td>Рынок</td><td>~90 (по 30)</td></tr>
+                                <tr class="bg-dark font-bold text-accent"><td colspan="3" class="text-right">ИТОГО ЕДА:</td><td>~2 866 грн</td></tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <!-- Pharma Table -->
+                <div>
+                    <h3 class="text-xl font-bold text-white mb-3 border-l-4 border-warn pl-3">💊 Аптека (Дженерики Tabletki.ua)</h3>
+                    <p class="text-xs text-gray-400 mb-3">В наличии: Золопент, Гавискон, Омега-3, Аминалон, Wellness Men. Докупаем базу для ЦНС в АНЦ/Копейке.</p>
+                    <div class="overflow-x-auto rounded-xl border border-gray-800">
+                        <table class="w-full text-left text-sm whitespace-nowrap">
+                            <thead class="bg-dark text-warn uppercase">
+                                <tr><th>Препарат</th><th>Форма / Доза</th><th>Для чего (Бро-наука)</th><th>Бюджет</th></tr>
+                            </thead>
+                            <tbody class="divide-y divide-gray-800 bg-card text-gray-300">
+                                <tr><td class="font-bold text-white">L-Теанин</td><td>Таб, 100-200мг</td><td>Изолента для нервов от чая/стресса</td><td>~150 грн</td></tr>
+                                <tr><td class="font-bold text-white">Глицин</td><td>Порошок / Таб (3г)</td><td>Гасит ЦНС на ночь, дает глубокий сон</td><td>~40 грн</td></tr>
+                                <tr><td class="font-bold text-white">Таурин</td><td>Капс, 500мг</td><td>Удержит магний в клетке (синергия)</td><td>~120 грн</td></tr>
+                                <tr><td class="font-bold text-white">Родиола Розовая</td><td>Таб/Капли (50мг)</td><td>Ремонт дофаминовых рецепторов</td><td>~80 грн</td></tr>
+                                <tr><td class="font-bold text-white">Рибофлавин (В2)</td><td>Таб, 10мг</td><td>Запуск митохондрий с утра</td><td>~90 грн</td></tr>
+                                <tr><td class="font-bold text-white">Янтарная кислота</td><td>Таб (0.05г)</td><td>Энергия клеток (строго полтаблетки!)</td><td>~15 грн</td></tr>
+                                <tr class="bg-dark text-white"><td class="font-bold text-accent">Витамин С</td><td colspan="3">Аскорбат натрия (~40 грн) ИЛИ Лимоны по акции в Союзе. <span class="text-warn font-bold">Выбирает Мама!</span></td></tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- TAB 4: RED LINE (SAFETY) -->
+        <section id="redline" class="glass-panel p-4 md:p-8 hidden-tab border-l-4 border-alert">
+            <h2 class="font-header text-3xl text-alert mb-6 border-b border-gray-800 pb-3 uppercase tracking-widest">Красная Линия: Безопасность</h2>
+            
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6 text-sm">
+                
+                <div class="bg-alert/10 p-5 rounded-xl border border-alert/30">
+                    <h3 class="font-bold text-white text-lg mb-3 flex items-center gap-2">
+                        <span class="text-alert text-2xl">⛔</span> АБСОЛЮТНЫЕ ЗАПРЕТЫ
+                    </h3>
+                    <ul class="list-disc list-inside text-gray-300 space-y-2">
+                        <li><strong class="text-alert">Дыхание Вима Хофа:</strong> ЗАПРЕЩЕНО до 6-го месяца. Твоя ЦНС как оголенные провода, Вим Хоф сожжет их адреналином. Только спокойная диафрагма.</li>
+                        <li><strong class="text-alert">Кофе:</strong> ЗАПРЕЩЕН навсегда. Чай — 1 слабая чашка.</li>
+                        <li><strong class="text-alert">Задержка дыхания (Вальсальва):</strong> При тренировках и статике СТРОГО выдыхай на усилии. Задержишь дыхание = скакнет давление в животе = порвешь заживший Мэллори-Вейсс.</li>
+                        <li><strong class="text-alert">Реальные BFR-бинты:</strong> Запрещены. Риск для сосудов. Используем "Virtual BFR" (стато-динамика без расслабления мышцы в нижней точке).</li>
+                    </ul>
+                </div>
+
+                <div class="space-y-6">
+                    <div class="bg-warn/10 p-5 rounded-xl border border-warn/30">
+                        <h3 class="font-bold text-white text-lg mb-2 flex items-center gap-2">
+                            <span class="text-warn text-2xl">⚠️</span> ФИТИНОВЫЙ РАЗРЫВ
+                        </h3>
+                        <p class="text-gray-300">Минералы (Магний, Цинк в Wellness Men) <strong class="text-warn">КАТЕГОРИЧЕСКИ НЕЛЬЗЯ</strong> пить вместе с овсянкой, гречкой или чаем. Фитиновая кислота из каш свяжет их в камень и спустит в унитаз. Окно между кашей и витаминами — минимум 1.5 часа.</p>
+                    </div>
+
+                    <div class="bg-accent/10 p-5 rounded-xl border border-accent/30">
+                        <h3 class="font-bold text-white text-lg mb-2 flex items-center gap-2">
+                            <span class="text-accent text-2xl">🛡️</span> НЕЙРО-БРОНЯ (ПРАКТИКИ)
+                        </h3>
+                        <ul class="space-y-2 text-gray-300">
+                            <li><strong class="text-accent">Физиологический вздох:</strong> 2 коротких вдоха носом + 1 длинный выдох ртом. Делать при тахикардии. Гасит кортизол за 30 сек.</li>
+                            <li><strong class="text-accent">Релаксация Джекобсона (21:30):</strong> Лежа, по очереди сильно напрягаешь и расслабляешь мышцы (от ног к лицу). Снимает гипертонус после солей.</li>
+                        </ul>
+                    </div>
+                </div>
+
+            </div>
+        </section>
+
+    </div>
+
+    <script>
+        // Tab switching logic
+        function openTab(tabName) {
+            document.querySelectorAll('section').forEach(el => el.classList.add('hidden-tab'));
+            document.querySelectorAll('.tab-btn').forEach(el => el.classList.remove('active'));
+            
+            document.getElementById(tabName).classList.remove('hidden-tab');
+            document.getElementById('btn-' + tabName).classList.add('active');
+        }
+
+        // Clock & Task Logic synced to UTC+3 (Kyiv/Chernihiv)
+        function updateClock() {
+            const now = new Date();
+            // Calculate Kyiv time (UTC+3 for summer time, standard is UTC+2, assuming UTC+3 for simplicity in 2026)
+            const utc = now.getTime() + (now.getTimezoneOffset() * 60000);
+            const kyivTime = new Date(utc + (3600000 * 3)); 
+            
+            const hours = String(kyivTime.getHours()).padStart(2, '0');
+            const minutes = String(kyivTime.getMinutes()).padStart(2, '0');
+            const seconds = String(kyivTime.getSeconds()).padStart(2, '0');
+            
+            document.getElementById('clock').innerText = `${hours}:${minutes}:${seconds}`;
+            updateTask(kyivTime.getHours(), kyivTime.getMinutes());
+        }
+
+        function updateTask(h, m) {
+            const time = h + m/60;
+            let task = "Сон / Восстановление";
+            let details = "Спи под наклоном (+16°C). Идет выработка гормона роста.";
+
+            if (time >= 7.0 && time < 7.75) { task = "Пробуждение & Детокс"; details = "Вода, Золопент, Свет в глаза, Дыхание 4-4-6. БЕЗ ТЕЛЕФОНА!"; }
+            else if (time >= 7.75 && time < 8.4) { task = "Гимнастика & Хлорофилл"; details = "60 ударов пятками (Микулин)."; }
+            else if (time >= 8.4 && time < 10.0) { task = "Завтрак & Нейро-Стек"; details = "Овсянка, Яйца. Стек: В2, Янтарка, Теанин, Родиола."; }
+            else if (time >= 10.0 && time < 11.0) { task = "Минералы & Коллаген"; details = "Перекус БЕЗ КАШИ + Wellness Men. В 10:35 - Бульон из лап."; }
+            else if (time >= 11.0 && time < 11.5) { task = "Предтрен"; details = "1 Банан + Вода."; }
+            else if (time >= 11.5 && time < 12.5) { task = "ТРЕНИРОВКА (Архитектура Кейна)"; details = "Темп 6-3-1. Пульс до 100. Дыши на усилии!"; }
+            else if (time >= 12.5 && time < 13.8) { task = "Анаболическое Окно"; details = "Молоко + Банан + Креатин 3г."; }
+            else if (time >= 13.8 && time < 14.0) { task = "Разгон Желчи"; details = "Масло + Сало."; }
+            else if (time >= 14.0 && time < 16.0) { task = "Обед Богов & Жировой Стек"; details = "Печень/Сердца. В середине еды: Омега, D3+K2, CoQ10, PQQ."; }
+            else if (time >= 16.0 && time < 19.0) { task = "Полдник"; details = "Творог + Бор. Сделай зрительную паузу от монитора."; }
+            else if (time >= 19.0 && time < 21.0) { task = "Ужин (Финиш еды)"; details = "Желудки + Овощи. Изометрия Засса в дверном проеме."; }
+            else if (time >= 21.0 && time < 21.5) { task = "Ночной Казеин"; details = "Молоко/Творог + мед + желатин."; }
+            else if (time >= 21.5 && time < 22.5) { task = "Гашение ЦНС"; details = "Аминалон + Магний + Таурин + Глицин. Релаксация Джекобсона."; }
+            else if (time >= 22.5 && time < 24.0) { task = "Подготовка ко сну"; details = "Обливание ног, Гавискон, Отбой."; }
+
+            document.getElementById('current-task').innerText = task;
+            document.getElementById('current-details').innerText = details;
+
+            // Highlight current timeline item (basic logic)
+            document.querySelectorAll('.group').forEach(el => el.classList.remove('is-active', 'shadow-[0_0_15px_rgba(0,255,204,0.4)]'));
+            const groups = document.querySelectorAll('.group');
+            if(h>=7 && h<8) groups[0].classList.add('is-active');
+            if(h>=8 && h<10) groups[1].classList.add('is-active');
+            if(h>=10 && h<11) groups[2].classList.add('is-active');
+            if(h>=11 && h<13) groups[3].classList.add('is-active');
+            if(h>=13 && h<16) groups[4].classList.add('is-active');
+            if(h>=16 && h<21) groups[5].classList.add('is-active');
+            if(h>=21) groups[6].classList.add('is-active');
+        }
+
+        setInterval(updateClock, 1000);
+        updateClock();
+    </script>
+</body>
+</html>
