@@ -1,0 +1,16 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 192 192">
+  <!-- Background -->
+  <rect width="192" height="192" rx="36" fill="#0a0a0a"/>
+  <!-- Outer ring -->
+  <circle cx="96" cy="96" r="78" fill="none" stroke="#1a1a1a" stroke-width="4"/>
+  <!-- Fire shape - outer -->
+  <path d="M96 28 C68 58 50 78 50 106 C50 140 70 164 96 164 C122 164 142 140 142 106 C142 78 124 58 96 28Z" fill="#f97316"/>
+  <!-- Fire shape - middle -->
+  <path d="M96 55 C78 78 68 94 68 112 C68 132 80 148 96 148 C112 148 124 132 124 112 C124 94 114 78 96 55Z" fill="#eab308"/>
+  <!-- Fire shape - inner core -->
+  <path d="M96 85 C88 98 84 108 86 118 C88 128 92 136 96 136 C100 136 104 128 106 118 C108 108 104 98 96 85Z" fill="#22c55e"/>
+  <!-- Glow dot -->
+  <circle cx="96" cy="120" r="8" fill="#22c55e" opacity="0.9"/>
+  <!-- ТАНК label -->
+  <text x="96" y="186" text-anchor="middle" font-family="Arial Black, Arial, sans-serif" font-size="18" fill="#22c55e" font-weight="900" letter-spacing="4">ТАНК</text>
+</svg>
