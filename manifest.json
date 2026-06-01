@@ -1,8 +1,8 @@
 {
   "name": "Жилистый Танк",
   "short_name": "Танк",
-  "description": "Дневник питания и тренировок — протокол Кейна",
-  "start_url": "./",
+  "description": "Трекер питания и AI-тренер. Чернигов 🇺🇦",
+  "start_url": "./index.html",
   "scope": "./",
   "display": "standalone",
   "orientation": "portrait",
@@ -11,12 +11,36 @@
   "lang": "ru",
   "icons": [
     {
-      "src": "icon.svg",
-      "sizes": "any",
-      "type": "image/svg+xml",
+      "src": "icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
       "purpose": "any maskable"
     }
   ],
-  "categories": ["health", "fitness"],
-  "prefer_related_applications": false
+  "shortcuts": [
+    {
+      "name": "+Вода 250мл",
+      "short_name": "Вода",
+      "url": "./index.html?action=water",
+      "icons": [{"src": "icon-192.png", "sizes": "96x96"}]
+    },
+    {
+      "name": "+Вес",
+      "short_name": "Вес",
+      "url": "./index.html?action=weight",
+      "icons": [{"src": "icon-192.png", "sizes": "96x96"}]
+    },
+    {
+      "name": "Шитти-день",
+      "short_name": "Plan B",
+      "url": "./index.html?action=shitty",
+      "icons": [{"src": "icon-192.png", "sizes": "96x96"}]
+    }
+  ]
 }
